@@ -28,28 +28,24 @@ for mybrake in mybrakes {
   mybrake:GETMODULE("ModuleAeroSurface"):doaction("extend", true).
 }
 
-WHEN ALT:RADAR < 50000 THEN {
-  PRINT "Retracting brakes...".
-  for mybrake in mybrakes {
-    mybrake:GETMODULE("ModuleAeroSurface"):doaction("retract", true).
-  }
+WAIT UNTIL ALT:RADAR < 50000.
+PRINT "Retracting brakes...".
+for mybrake in mybrakes {
+  mybrake:GETMODULE("ModuleAeroSurface"):doaction("retract", true).
 }
 
-WHEN ALT:RADAR < 15000 THEN {
-  PRINT "Extending brakes...".
-  for mybrake in mybrakes {
-    mybrake:GETMODULE("ModuleAeroSurface"):doaction("extend", true).
-  }
+WAIT UNTIL ALT:RADAR < 15000.
+PRINT "Extending brakes...".
+for mybrake in mybrakes {
+  mybrake:GETMODULE("ModuleAeroSurface"):doaction("extend", true).
 }
 
-WHEN GROUNDSPEED < 5 AND VERTICALSPEED < 10 THEN {
-  SHIP:PARTSDUBBED("antenna")[0]:GETMODULE("ModuleRTAntenna"):doaction("activate", true).
-}
+WAIT UNTIL GROUNDSPEED < 5 AND VERTICALSPEED < 10.
+SHIP:PARTSDUBBED("antenna")[0]:GETMODULE("ModuleRTAntenna"):doaction("activate", true).
 
-WHEN ALT:RADAR < 100 THEN {
-  PRINT "Final burn...".
-  LOCK THROTTLE to 0.03.
-}
+WAIT UNTIL ALT:RADAR < 100.
+PRINT "Final burn...".
+LOCK THROTTLE to 0.03.
 
 wait until STATUS = "LANDED".
 
