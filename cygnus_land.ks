@@ -45,7 +45,7 @@ SHIP:PARTSDUBBED("antenna")[0]:GETMODULE("ModuleRTAntenna"):doaction("activate",
 
 WAIT UNTIL ALT:RADAR < 100.
 PRINT "Final burn...".
-LOCK THROTTLE to 0.03.
+LOCK THROTTLE to 0.04.
 
 wait until STATUS = "LANDED".
 
