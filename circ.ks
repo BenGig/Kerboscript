@@ -4,14 +4,14 @@
 // Circularizes at the nearest apsis.
 /////////////////////////////////////////////////////////////////////////////
 
-run once lib_ui.
+run once "0:/lib_ui".
 
 if obt:transition = "ESCAPE" or eta:periapsis < eta:apoapsis {
-  run node_apo(obt:periapsis).
+  runpath("0:/node_apo", obt:periapsis).
 } else {
-  run node_peri(obt:apoapsis).
+  runpath("0:/node_peri", obt:apoapsis).
 }
 
-run node.
+run "0:/node".
 
 uiBanner("Circ", "Circularized; e=" + round(ship:obt:eccentricity, 3)).

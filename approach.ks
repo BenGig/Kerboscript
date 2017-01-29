@@ -20,7 +20,8 @@ if target:position:mag > 5000 or vel:mag > 25 {
   run node_vel_tgt.
   local crit is 2 * vel:mag / accel.
   if nextnode:eta > crit {
-    run warp(nextnode:eta - crit).
+    //run warp(nextnode:eta - crit).
+	run warp(nextnode:eta - 300).
   }
 
   if target:position:mag / vel:mag < 30 { // Nearby target; come to a stop first

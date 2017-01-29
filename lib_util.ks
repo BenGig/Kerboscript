@@ -48,7 +48,7 @@ function utilCloseApproach {
 }
 
 function utilHasNextNode {
-  local sentinel is node(time:seconds + 9999999999, 0, 0, 0).
+  local sentinel is node(time:seconds + 999999999, 0, 0, 0).
   add sentinel.
   local nn is nextnode.
   remove sentinel.

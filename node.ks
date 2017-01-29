@@ -4,7 +4,7 @@
 // Execute a maneuver node, warping if necessary to save time.
 /////////////////////////////////////////////////////////////////////////////
 
-run lib_ui.
+run "0:/lib_ui".
 
 // quo vadis?
 global nodeNd is nextnode.
@@ -29,7 +29,7 @@ wait until vdot(facing:forevector, nodeFacing:forevector) >= 0.995 or nodeNd:eta
 // warp to burn time; give 3 seconds slack for final steering adjustments
 global nodeHang is (nodeNd:eta - nodeDob/2) - 3.
 if nodeHang > 0 {
-  run warp(nodeHang).
+  runpath("0:/warp", nodeHang).
   wait 3.
 }
 
