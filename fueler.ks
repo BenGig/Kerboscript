@@ -58,7 +58,7 @@ IF receiverTanks:LENGTH > 0 {
   SET job TO TRANSFER(choice, shuttleTanks, storage).
 }
 
-PRINT "Starting job...".
 SET job:ACTIVE TO true.
-PRINT "ok.".
+hudtext("Job started.", 3, 2, 12, yellow).
+run fueler.
 
