@@ -79,3 +79,20 @@ function PID_seek {
 
   return newInput.
 }.
+
+function PID_update {
+  parameter
+    PID_array,
+	Kp,      // gain of position
+    Ki,      // gain of integral
+    Kd,      // gain of derivative
+	cMin,  // the bottom limit of the control range (to protect against integral windup)
+    cMax.  // the the upper limit of the control range (to protect against integral windup)
+	
+	set PID_array[0] to Kp.
+	set PID_array[1] to Ki.
+	set PID_array[2] to Kd.
+	set PID_array[3] to cMin.
+	set PID_array[4] to cMax.
+	return PID_array.
+}.

@@ -35,7 +35,7 @@ global launch_gtScale is 2.
 function ascentSteering {
   // How far through our gravity turn are we? (0..1)
   local gtPct is (ship:altitude - launch_gt0) / (launch_gt1 - launch_gt0).
-
+ 
   // Ideal gravity-turn azimuth (inclination) and facing at present altitude.
   local inclin is min(90, max(0, 90 * cos(launch_gtScale * 90 * gtPct))).
   local gtFacing is heading(90, inclin):vector.
@@ -122,6 +122,7 @@ function ascentWarping {
 /////////////////////////////////////////////////////////////////////////////
 
 sas off.
+//sas on.
 
 if ship:status <> "prelaunch" and stage:solidfuel = 0 {
   // note that there's no SRB
