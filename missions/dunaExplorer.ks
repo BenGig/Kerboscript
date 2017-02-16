@@ -75,12 +75,12 @@ function launch_scisat {
   
   clearscreen.
   set proc to processor(scisat + "CPU").
-  set msg to scisat+":"+ship:shipname.
+  set msg to scisat.
   if proc:connection:sendmessage(msg) {
     print "SciSat launch initiated.".
   }
-  wait 10.
-  set dish to ship:partsnamed(scisat + "Kom").
+  wait 30.
+  set dish to ship:partstagged(scisat + "Kom")[0].
   dish:getmodule("ModuleRTAntenna"):doaction("activate", true).
   dish:getmodule("ModuleRTAntenna"):setfield("target", scisat).
 }
