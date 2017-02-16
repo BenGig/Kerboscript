@@ -7,6 +7,7 @@
 
 // Final apoapsis (m altitude)
 parameter apo.
+parameter turn_sharpness is 2.
 
 // Number of seconds to sleep during ascent loop
 global launch_tick is 1.
@@ -26,7 +27,7 @@ global launch_gt1 is body:atm:height * 0.8.
 // turn, and the sharpness is a scaling factor for the input to the cosine
 // function. Higher numbers are sharper, lower numbers are gentler.
 // TODO get rid of this once we solve "tipping" issue
-global launch_gtScale is 2.
+global launch_gtScale is turn_sharpness.
 
 /////////////////////////////////////////////////////////////////////////////
 // Steering function that uses the launch_gt* to perform a gravity turn.
@@ -137,9 +138,15 @@ set ship:control:pilotmainthrottle to 0.
 // Enter ascent loop.
 /////////////////////////////////////////////////////////////////////////////
 
+when alt:radar > 70000 then {
+  if exists("mission_post_atmo.ks") {
+    runpath("mission_post_atmo.ks").
+  }
+}
+
 until ship:obt:apoapsis >= apo {
   ascentStaging().
-  ascentWarping().
+//  ascentWarping(). 
   wait launch_tick.
 }
 
@@ -171,11 +178,7 @@ until ship:availablethrust > 0 {
 until ship:altitude > body:atm:height {
   ascentWarping().
 }
-ship:partsdubbed("antenna")[0]:getmodule("ModuleRTAntenna"):doaction("activate", true).
-for panel in ship:partsdubbed("panel") {
-  panel:getmodule("ModuleDeployableSolarPanel"):doaction("extend solar panel", true).
-}
 
 set warp to 0.
 
-run "0:/circ".
+runpath("circ.ks").

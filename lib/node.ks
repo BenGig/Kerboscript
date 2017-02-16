@@ -4,7 +4,7 @@
 // Execute a maneuver node, warping if necessary to save time.
 /////////////////////////////////////////////////////////////////////////////
 
-run "0:/lib_ui".
+runpath("lib_ui").
 
 // quo vadis?
 global nodeNd is nextnode.
@@ -24,14 +24,17 @@ global nodeFacing is lookdirup(nodeNd:deltav, ship:facing:topvector).
 global nodeDob is (nodeNd:deltav:mag / nodeAccel).
 
 uiDebug("Orient to burn").
-wait until vdot(facing:forevector, nodeFacing:forevector) >= 0.995 or nodeNd:eta <= nodeDob / 2.
+//wait until vdot(facing:forevector, nodeFacing:forevector) >= 0.997 or nodeNd:eta <= nodeDob / 2.
+wait until nodeNd:eta <= nodeDob / 2.
 
 // warp to burn time; give 3 seconds slack for final steering adjustments
 global nodeHang is (nodeNd:eta - nodeDob/2) - 3.
-if nodeHang > 0 {
-  runpath("0:/warp", nodeHang).
-  wait 3.
-}
+//if nodeHang > 0 {
+//  runpath("0:/warp", nodeHang).
+//  wait 3.
+//}
+
+
 
 global nodeDone  is false.
 global nodeDv0   is nodeNd:deltav.
@@ -57,7 +60,7 @@ until nodeDone
       //   3) burn DV gets too small for main engines to cope with
       set nodeDone to (vdot(nodeDv0, nodeNd:deltav) < 0) or
                       (nodeNd:deltav:mag > nodeDvMin + 0.1) or
-                      (nodeNd:deltav:mag <= 0.2).
+                      (nodeNd:deltav:mag <= 0.1).
     } else {
         // no nodeAccel -- out of fuel; time to auto stage!
         uiWarning("Node", "Stage " + stage:number + " separation during burn").

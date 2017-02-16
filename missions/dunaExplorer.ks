@@ -26,14 +26,16 @@ function do_komSat_undock {
     wait 5.
     return.
   }
+  
+  for panel in ship:partsdubbed("corePanel") {
+    panel:getmodule("ModuleDeployableSolarPanel"):doaction("retract solar panel", true).
+  }
   set separator to satRoot.
   gatherParts(satRoot, satParts).
 
   for item in satParts {
     if item:name = "commDish" {
       set dish to item.
-      print item:getmodule("ModuleRTAntenna"):allfields.
-      wait 5. 
     }
     if item:name = "longAntenna" {
       set omni to item.
@@ -62,55 +64,43 @@ function do_komSat_undock {
   print "Ready for separation.".
   separator:getmodule("ModuleDecouple"):doaction("decouple", true).
   komSats:remove(komSat).
-}
-
-function do_komSat {
-  parameter komSat.
-  
-  set komSatAction to "".
-  set komSatActions TO list ("Undock","Exit").
-  until 0 {
-    set komSatAction to open_list_dialog("Select action", komSatActions).
-    if komSatActions[komSatAction] = "Exit" { return. }
-    if komSatActions[komSatAction] = "Undock" {
-      do_komSat_undock(komSat).
-    }
+  wait 30.
+  for panel in ship:partsdubbed("corePanel") {
+    panel:getmodule("ModuleDeployableSolarPanel"):doaction("extend solar panel", true).
   }
 }
 
-//for elem in eList {
-//  elem_names:add(elem:NAME).
-//}
+function launch_scisat {
+  parameter scisat.
+  
+  clearscreen.
+  set proc to processor(scisat + "CPU").
+  set msg to scisat+":"+ship:shipname.
+  if proc:connection:sendmessage(msg) {
+    print "SciSat launch initiated.".
+  }
+  wait 10.
+  set dish to ship:partsnamed(scisat + "Kom").
+  dish:getmodule("ModuleRTAntenna"):doaction("activate", true).
+  dish:getmodule("ModuleRTAntenna"):setfield("target", scisat).
+}
 
 set action to "".
-set actions TO list("KomSat","Maneuver","Exit").
+set actions TO list("KomSat launch","KomSat release orbit","SciSat1","SciSat2","Exit").
   
 until 0 {
   set action to open_list_dialog("Select action", actions).
 
   if actions[action] = "Exit" { break. }
-  if actions[action] = "KomSat" {
+  if actions[action] = "KomSat launch" {
     until 0 {
       set komSat to open_list_dialog("Select satellite", komSats).
       if komSats[komSat] = "Exit" {
         break.
       }
-      do_komSat(komSat).
+      do_komSat_undock(komSat).
 	  }
   }
-  if actions[action] = "Maneuver" {
-    until 0 {
-      set maneuver to open_list_dialog("Select action", maneuvers).
-      if maneuvers[maneuver] = "Exit" { break. }
-      if maneuvers[maneuver] = "Launch" {
-        runpath("0:/lib_launch_asc", 100000).
-        stage.
-        ship:partsdubbed("coreAntenna")[0]:getmodule("ModuleRTAntenna"):doaction("activate", true).
-        ship:partsdubbed("coreAntenna")[0]:getmodule("ModuleRTAntenna"):setfield("target", "Kerbin").
-        ship:partsdubbed("coreAntenna")[1]:getmodule("ModuleRTAntenna"):doaction("activate", true).
-        ship:partsdubbed("coreAntenna")[1]:getmodule("ModuleRTAntenna"):setfield("target", "Kerbin").
-      }
-      if maneuvers[maneuver] = "KomSat release orbit" { ejection_orbit(4). }
-    }
-  }
+  if actions[action] = "KomSat release orbit" { ejection_orbit(4). }
+  if actions[action] = "SciSat1" or actions[action] = "SciSat2" { launch_scisat(actions[action]). }
 }

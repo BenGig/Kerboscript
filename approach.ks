@@ -69,7 +69,7 @@ lock steering to lookdirup(-velR:normalized, ship:facing:upvector).
 wait until vdot(-velR:normalized, ship:facing:forevector) >= 0.99.
 local stopDistance is 0.5 * accel * (vel:mag / accel)^2.
 local dt is (target:position:mag - stopDistance - 10) / vel:mag.
-run warp(dt).
+// run warp(dt).
 
 dockMatchVelocity(max(1.0, min(10.0, target:position:mag / 60.0))).
 

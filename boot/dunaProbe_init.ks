@@ -11,7 +11,6 @@ copypath("0:/lib/node_apo.ks", "1:").
 copypath("0:/lib/node_peri.ks", "1:").
 
 
-copypath("0:/missions/dunaExplorer.ks", "1:/mission.ks").
-copypath("0:/missions/dunaExplorer_post_atmo.ks", "1:/mission_post_atmo.ks").
+copypath("0:/missions/dunaProbe.ks", "1:/").
 
-run "main_menu.ks".
+run "dunaProbe.ks".

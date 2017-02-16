@@ -21,7 +21,7 @@ function shuttle_restock_amount {
   }
 }
 
-runoncepath("0:/lib_list_dialog").
+runoncepath("lib_list_dialog.ks").
 
 set remainingFuel TO 50.
 
@@ -59,6 +59,5 @@ IF receiverTanks:LENGTH > 0 {
 }
 
 SET job:ACTIVE TO true.
-hudtext("Job started.", 3, 2, 12, yellow).
-run fueler.
+hudtext("Transfer started.", 3, 2, 12, yellow).
 
