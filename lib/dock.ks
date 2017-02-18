@@ -46,6 +46,7 @@ if dock_myPort <> 0 {
       vdot(rawV, sense:upvector),
       vdot(rawV, sense:vector)
     ).
+    if not hastarget { break. }
     local needAlign is vdot(target:position:normalized, target:facing:forevector) > -0.9975.
 
     uiShowPorts(dock_myPort, target, dock_start / 2, not needAlign).
