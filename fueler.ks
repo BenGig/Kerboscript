@@ -5,6 +5,20 @@
 // From fuel shuttle to storage
 // from storage to some consumer ship
 
+if not exists("1:/lib_list_dialog.ks") {
+  copypath("0:/lib/lib_list_dialog.ks", "1:").
+}
+if not exists("1:/lib_menu.ks") {
+  copypath("0:/lib/lib_menu.ks", "1:").
+}
+if not exists("1:/lib_gui_box.ks") {
+  copypath("0:/lib/lib_gui_box.ks", "1:").
+}
+if not exists("1:/spec_char.ksm") {
+  copypath("0:/lib/spec_char.ksm", "1:").
+}
+
+
 FUNCTION fuelLevel {
   PARAMETER tank.
   RETURN tank:mass - tank:drymass.
@@ -25,39 +39,43 @@ runoncepath("lib_list_dialog.ks").
 
 set remainingFuel TO 50.
 
-set receiverTanks TO list().
-set shuttleTanks TO list().
+until 0 {
+    clearscreen.
+	print "Press key to start fueling menu, 'q' to quit".
+	if terminal:input:getchar() = "q" { break. }
+	
+	set receiverTanks TO list().
+	set shuttleTanks TO list().
 
-// List of storage tanks
-set storage to SHIP:PARTSTAGGED("storageTank").
+	// List of storage tanks
+	set storage to SHIP:PARTSTAGGED("storageTank").
 
-// Get docked ships, select vessel
-list elements in eList.
-set elem_names TO list().
-for elem in eList {
-  elem_names:add(elem:NAME).
+	// Get docked ships, select vessel
+	list elements in eList.
+	set elem_names TO list().
+	for elem in eList {
+	  elem_names:add(elem:NAME).
+	}
+
+	set choice to open_list_dialog("Select docked vessel", elem_names).
+	set selectedShip to elist[choice].
+
+	FOR item IN selectedShip:PARTS {
+	  IF item:TAG = "receiverTank" {
+		receiverTanks:ADD(item).
+	  } 
+	  IF item:TAG = "shuttleTank" {
+		shuttleTanks:ADD(item).
+	  } 
+	}
+
+	set choice to open_menu("Select resource", list("liquidfuel","monopropellant","oxidizer")).
+
+	IF receiverTanks:LENGTH > 0 {
+	  SET job TO TRANSFERALL(choice, storage, receiverTanks).
+	} ELSE {
+	  SET job TO TRANSFERALL(choice, shuttleTanks, storage).
+	}
+
+	SET job:ACTIVE TO true.
 }
-
-set choice to open_list_dialog("Select docked vessel", elem_names).
-set selectedShip to elist[choice].
-
-FOR item IN selectedShip:PARTS {
-  IF item:TAG = "receiverTank" {
-	receiverTanks:ADD(item).
-  } 
-  IF item:TAG = "shuttleTank" {
-	shuttleTanks:ADD(item).
-  } 
-}
-
-set choice to open_menu("Select resource", list("liquidfuel","monoprop","oxidizer")).
-
-IF receiverTanks:LENGTH > 0 {
-  SET job TO TRANSFERALL(choice, storage, receiverTanks).
-} ELSE {
-  SET job TO TRANSFER(choice, shuttleTanks, storage).
-}
-
-SET job:ACTIVE TO true.
-hudtext("Transfer started.", 3, 2, 12, yellow).
-
