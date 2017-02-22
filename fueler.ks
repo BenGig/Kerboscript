@@ -5,6 +5,19 @@
 // From fuel shuttle to storage
 // from storage to some consumer ship
 
+if not exists("1:/lib_list_dialog.ks") {
+  copypath("0:/lib/lib_list_dialog.ks", "1:").
+}
+if not exists("1:/lib_menu.ks") {
+  copypath("0:/lib/lib_menu.ks", "1:").
+}
+if not exists("1:/lib_gui_box.ks") {
+  copypath("0:/lib/lib_gui_box.ks", "1:").
+}
+if not exists("1:/spec_char.ksm") {
+  copypath("0:/lib/spec_char.ksm", "1:").
+}
+
 function fuel_transfer {
   parameter from_tanks, to_tanks, limit is 0.
 
@@ -22,22 +35,6 @@ function fuel_transfer {
   }
   set job_mp_tock = transfer("monopropellant", to_tanks, from_tanks, 30).
   set job_mp_tock:active = true.
-}
-
-FUNCTION fuelLevel {
-  PARAMETER tank.
-  RETURN tank:mass - tank:drymass.
-}
-
-function shuttle_restock_amount {
-  if body:name = "Kerbin" {
-    // Fuel transporter Mun - Kerbin
-    return 450.
-  }
-  if body:name = "Mun" {
-    // Fuel lifter Mun Mine - Mun Fuel Station
-    return 250.
-  }
 }
 
 runoncepath("lib_list_dialog.ks").
@@ -110,42 +107,3 @@ until 0 {
     fuel_transfer(storageTanks, shuttleTanks, 0).
   }
 }
-
-set remainingFuel TO 50.
-
-set receiverTanks TO list().
-set shuttleTanks TO list().
-
-// List of storage tanks
-set storage to SHIP:PARTSTAGGED("storageTank").
-
-// Get docked ships, select vessel
-list elements in eList.
-set elem_names TO list().
-for elem in eList {
-  elem_names:add(elem:NAME).
-}
-
-set choice to open_list_dialog("Select docked vessel", elem_names).
-set selectedShip to elist[choice].
-
-FOR item IN selectedShip:PARTS {
-  IF item:TAG = "receiverTank" {
-	receiverTanks:ADD(item).
-  } 
-  IF item:TAG = "shuttleTank" {
-	shuttleTanks:ADD(item).
-  } 
-}
-
-set choice to open_menu("Select resource", list("liquidfuel","monoprop","oxidizer")).
-
-IF receiverTanks:LENGTH > 0 {
-  SET job TO TRANSFERALL(choice, storage, receiverTanks).
-} ELSE {
-  SET job TO TRANSFER(choice, shuttleTanks, storage).
-}
-
-SET job:ACTIVE TO true.
-hudtext("Transfer started.", 3, 2, 12, yellow).
-

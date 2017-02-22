@@ -181,4 +181,4 @@ until ship:altitude > body:atm:height {
 
 set warp to 0.
 
-runpath("circ.ks").
+runpath("0:/lib/circ.ks").
