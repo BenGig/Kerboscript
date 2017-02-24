@@ -21,20 +21,24 @@ if not exists("1:/spec_char.ksm") {
 function fuel_transfer {
   parameter from_tanks, to_tanks, limit is 0.
 
-  set job_lf_tick = transferall("liquidfuel", from_tanks, to_tanks.
-  set job_lf_tick:active = true.
+  set job_lf_tick to transferall("liquidfuel", from_tanks, to_tanks).
+  set job_lf_tick:active to true.
+  set job_lf_tick to transferall("oxidizer", from_tanks, to_tanks).
+  set job_lf_tick:active to true.
   
-  set job_mp_tick = transferall("monopropellant", from_tanks, to_tanks).
-  set job_mp_tick:active = true. 
+  set job_mp_tick to transferall("monopropellant", from_tanks, to_tanks).
+  set job_mp_tick:active to true. 
 
+  return.
+  
   wait 3.
   
   if limit > 0 {
-    set job_lf_tock = transfer("liquidfuel", to_tanks, from_tanks, limit).
-    set job_lf_tock:active = true.
+    set job_lf_tock to transfer("liquidfuel", to_tanks, from_tanks, limit).
+    set job_lf_tock:active to true.
   }
-  set job_mp_tock = transfer("monopropellant", to_tanks, from_tanks, 30).
-  set job_mp_tock:active = true.
+  set job_mp_tock to transfer("monopropellant", to_tanks, from_tanks, 0).
+  set job_mp_tock:active to true.
 }
 
 runoncepath("lib_list_dialog.ks").
@@ -50,15 +54,17 @@ until 0 {
   list elements in eList.
 
   set dockedShips to list().
+  set dockedShipNames to list().
 
   set choice to open_menu("Select mode", modeList).
   if choice = "Refuel UT" {
     for elem in eList {
       if elem:name:startswith("UT") {
-        dockedShips:add(elem:name).
+        dockedShipsNames:add(elem:name).
+        dockedShips:add(elem).
       }
     }
-    set choice to open_list_dialog("Select UT to refuel", dockedShips).
+    set choice to open_list_dialog("Select UT to refuel", dockedShipsNames).
     set targetShip to dockedShips[choice].
     FOR item IN targetShip:PARTS {
       IF item:TAG = "receiverTank" {
@@ -70,10 +76,11 @@ until 0 {
   if choice = "Restock" {
     for elem in eList {
       if elem:name:contains(shuttleName) {    
-        dockedShips:add(elem:name).
+        dockedShips:add(elem).
+        dockedShipNames:add(elem:name).
       }
     }
-    set choice to open_list_dialog("Select ship to restock from", dockedShips).
+    set choice to open_list_dialog("Select ship to restock from", dockedShipNames).
     set refuelerShip to dockedShips[choice].
     set shuttleTanks to list().
     for item in refuelerShip:parts {
@@ -81,7 +88,9 @@ until 0 {
         shuttleTanks:add(item).
       }
     }
-    fuel_transfer(shuttleTanks, storageTanks, 700).
+    print "Initiating fuel transfer.".
+    fuel_transfer(shuttleTanks, storageTanks, 0).
+    print "Fuel transfer complete.".
   }
   if choice = "Load shuttle" {
     for elem in eList {
@@ -96,7 +105,7 @@ until 0 {
         }
       }
     }
-    set choice to open_list_dialog("Select oiler to refuel", dockedShips).
+    set choice to open_list_dialog("Select oiler to refuel", dockedShipsNames).
     set shuttleShip to dockedShips[choice].
     set shuttleTanks to list().
     for item in shuttleShip:parts {
