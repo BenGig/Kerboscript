@@ -1,5 +1,7 @@
 // Start program just before over island in center of crater
 
+
+
 clearscreen.
 
 SET burnspeed TO 60.
@@ -20,6 +22,9 @@ WHEN GROUNDSPEED < vdest AND GROUNDSPEED > 100 THEN {
 	PRINT "End deorbit burn.".
     set ship:control:mainthrottle to 0.
 }
+
+//set f to ship:prograde.
+//lock steering to f.
 
 PRINT "Deorbit burn.".
 set ship:control:mainthrottle to 0.1.
@@ -60,3 +65,4 @@ set ship:control:mainthrottle to 0.04.
 wait until STATUS <> "FLYING".
 
 set ship:control:mainthrottle to 0.
+unlock steering.

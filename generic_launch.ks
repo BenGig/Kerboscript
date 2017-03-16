@@ -20,8 +20,8 @@ global launch_tStage is time:seconds.
 
 // Starting/ending height of gravity turn
 // TODO adjust for atmospheric pressure; this works for Kerbin
-global launch_gt0 is body:atm:height * 0.03.
-global launch_gt1 is body:atm:height * 0.8.
+global launch_gt0 is body:atm:height * 0.02.
+global launch_gt1 is body:atm:height * 0.85.
 
 // "Sharpness" of gravity turn; we use a cosine function to modulate the
 // turn, and the sharpness is a scaling factor for the input to the cosine
@@ -181,4 +181,4 @@ until ship:altitude > body:atm:height {
 
 set warp to 0.
 
-runpath("0:/lib/circ.ks").
+runpath("circ.ks").

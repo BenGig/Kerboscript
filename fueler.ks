@@ -31,24 +31,23 @@ function fuel_transfer {
 
   return.
   
-  wait 3.
+  wait 10.
   
   if limit > 0 {
     set job_lf_tock to transfer("liquidfuel", to_tanks, from_tanks, limit).
     set job_lf_tock:active to true.
+    set job_mp_tock to transfer("monopropellant", to_tanks, from_tanks, 50).
+    set job_mp_tock:active to true.
   }
-  set job_mp_tock to transfer("monopropellant", to_tanks, from_tanks, 0).
-  set job_mp_tock:active to true.
 }
 
 runoncepath("lib_list_dialog.ks").
 
-until 0 {
   // List of storage tanks. Always the same.
   set storageTanks to SHIP:PARTSTAGGED("storageTank").
-  
+  set remainingFuel to 0.
   set modeList to list("Refuel UT","Restock","Load shuttle","General refueling").
-  if body:name = "Kerbin" { modeList:remove(2). set shuttleName to "Transfer". }
+  if body:name = "Kerbin" { modeList:remove(2). set shuttleName to "Shuttle". set remainingFuel to 400. }
   if body:name = "Mun" { set shuttleName to "Fueler". }
 
   list elements in eList.
@@ -56,16 +55,18 @@ until 0 {
   set dockedShips to list().
   set dockedShipNames to list().
 
+  clearscreen.
   set choice to open_menu("Select mode", modeList).
   if choice = "Refuel UT" {
     for elem in eList {
       if elem:name:startswith("UT") {
-        dockedShipsNames:add(elem:name).
+        dockedShipNames:add(elem:name).
         dockedShips:add(elem).
       }
     }
-    set choice to open_list_dialog("Select UT to refuel", dockedShipsNames).
+    set choice to open_list_dialog("Select UT to refuel", dockedShipNames).
     set targetShip to dockedShips[choice].
+	set receiverTanks to list().
     FOR item IN targetShip:PARTS {
       IF item:TAG = "receiverTank" {
         receiverTanks:ADD(item).
@@ -81,6 +82,7 @@ until 0 {
       }
     }
     set choice to open_list_dialog("Select ship to restock from", dockedShipNames).
+	clearscreen.
     set refuelerShip to dockedShips[choice].
     set shuttleTanks to list().
     for item in refuelerShip:parts {
@@ -89,15 +91,19 @@ until 0 {
       }
     }
     print "Initiating fuel transfer.".
+	
     fuel_transfer(shuttleTanks, storageTanks, 0).
-    print "Fuel transfer complete.".
+	if remainingFuel > 0 {
+	  fuel_transfer(storageTanks, shuttleTanks, remainingFuel).
+	}
   }
   if choice = "Load shuttle" {
     for elem in eList {
       // are we at mine on Mun?
       if ship:status = "LANDED" {
         if elem:name:contains("Fueler") {          
-          dockedShips:add(elem:name).
+          dockedShips:add(elem).
+		  dockedShipNames:add(elem:name).
         }
       } else {
         if elem:name:contains("Transfer") {    
@@ -105,14 +111,17 @@ until 0 {
         }
       }
     }
-    set choice to open_list_dialog("Select oiler to refuel", dockedShipsNames).
+    set choice to open_list_dialog("Select oiler to refuel", dockedShipNames).
     set shuttleShip to dockedShips[choice].
     set shuttleTanks to list().
     for item in shuttleShip:parts {
       if item:tag = "shuttleTank" {
         shuttleTanks:add(item).
       }
+      if item:tag = "privateTank" {
+        shuttleTanks:add(item).
+      }
     }
     fuel_transfer(storageTanks, shuttleTanks, 0).
   }
-}
+
