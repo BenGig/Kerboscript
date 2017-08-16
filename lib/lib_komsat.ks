@@ -21,21 +21,32 @@ function mnv_hko {
 function ejection_orbit {
   parameter number_of_sats.
   
-  lock steering to retrograde.
-  wait until vdot(facing:forevector, retrograde:forevector) >= 0.995.
+//  lock steering to retrograde.
+//  wait until vdot(facing:forevector, retrograde:forevector) >= 0.995.
   
-  set ej_orb_period to ship:orbit:period / number_of_sats * (number_of_sats -1).
+  set ej_orb_period to ship:orbit:period / number_of_sats * (number_of_sats -1) / 2.
   
-  lock throttle to tset.
+  clearscreen.
+  print "Half orbit time: " + ej_orb_period.
+  set hours to (ej_orb_period - mod(ej_orb_period, 3600))/3600.
+  set minutes_rest to ej_orb_period - hours*3600.
+  set minutes to (minutes_rest - mod(ej_orb_period-hours*3600, 60))/60.
+  set seconds to ej_orb_period - hours*3600 - minutes*60.
+  print "Calculated half orbit time: " + hours + " h " + minutes + " m " + seconds + " s".
+  terminal:input:getchar().
   
-  until 0 {
-    set tset to min(ship:orbit:period / ej_orb_period *10, 1).
-    if ship:orbit:period < ej_orb_period {
-      unlock throttle.
-      set ship:control:pilotmainthrottle to 0.
-      set ship:control:neutralize to true.
-      unlock steering.
-      break.
-    }
-  }  
+//  lock throttle to tset.
+  
+//  until 0 {
+//    set tset to min(ship:orbit:period / ej_orb_period *10, 1).
+//    if ship:orbit:period < ej_orb_period {
+//      unlock throttle.
+//      set ship:control:pilotmainthrottle to 0.
+//      set ship:control:neutralize to true.
+//      unlock steering.
+//      break.
+//    }
+//  }  
+
+  unlock steering.
 }

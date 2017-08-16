@@ -86,7 +86,7 @@ function launch_scisat {
 }
 
 set action to "".
-set actions TO list("KomSat launch","KomSat release orbit","SciSat1","SciSat2","Exit").
+set actions TO list("KomSat launch","KomSat Duna release orbit","KomSat Ike release orbit","SciSat1","SciSat2","Exit").
   
 until 0 {
   set action to open_list_dialog("Select action", actions).
@@ -101,6 +101,7 @@ until 0 {
       do_komSat_undock(komSat).
 	  }
   }
-  if actions[action] = "KomSat release orbit" { ejection_orbit(4). }
+  if actions[action] = "KomSat Duna release orbit" { ejection_orbit(4). }
+  if actions[action] = "KomSat Ike release orbit" { ejection_orbit(3). }
   if actions[action] = "SciSat1" or actions[action] = "SciSat2" { launch_scisat(actions[action]). }
 }

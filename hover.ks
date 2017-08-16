@@ -27,14 +27,10 @@ on ag3 { set seekAlt to seekAlt - 10. preserve. }.
 on ag4 { set seekAlt to seekAlt + 10. preserve. }.
 on ag5 { set seekAlt to seekAlt - 100. preserve. }.
 on ag6 { set seekAlt to seekAlt + 100. preserve. }.
+on ag8 { unlock steering. }.
+on ag9 { lock am to vang(up:vector, ship:facing:vector). }.
 
 set ship:control:pilotmainthrottle to 0.
-
-// hit "stage" until there's an active engine:
-until ship:availablethrust > 0 {
-  wait 0.5.
-  stage.
-}.
 
 // Call to update the display of numbers:
 declare function display_block {

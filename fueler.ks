@@ -106,8 +106,9 @@ runoncepath("lib_list_dialog.ks").
 		  dockedShipNames:add(elem:name).
         }
       } else {
-        if elem:name:contains("Transfer") {    
-          dockedShips:add(elem:name).
+        if elem:name:startswith("Fuel Shuttle") {    
+          dockedShips:add(elem).
+          dockedShipNames:add(elem:name).
         }
       }
     }
@@ -119,6 +120,9 @@ runoncepath("lib_list_dialog.ks").
         shuttleTanks:add(item).
       }
       if item:tag = "privateTank" {
+        shuttleTanks:add(item).
+      }
+      if item:tag = "receiverTank" {
         shuttleTanks:add(item).
       }
     }
