@@ -1,7 +1,7 @@
 runoncepath("lib_list_dialog").
 runoncepath("lib_komsat").
 
-set maneuvers to list("Launch","KomSat release orbit","Exit").
+//set maneuvers to list("Launch","KomSat release orbit","Sun expose","Exit").
 set komSats TO list("KomSat1","KomSat2","KomSat3","KomSat4","KomSat5","KomSat6","KomSat7","Exit").
 
 function gatherParts {
@@ -90,8 +90,17 @@ function launch_scisat {
 //  dish:getmodule("ModuleRTAntenna"):setfield("target", scisat).
 }
 
+function sun_expose {
+  clearscreen.
+  sas off.
+  set ship:control:roll to 0.01.
+  wait until (ship:facing:roll > 85 and ship:facing:roll < 95) or (ship:facing:roll > 265 and ship:facing:roll < 275).
+  set ship:control:roll to 0.
+  sas on.
+}
+
 set action to "".
-set actions TO list("KomSat launch","KomSat Duna release orbit","KomSat Ike release orbit","SciSat1","SciSat2","Exit").
+set actions TO list("Sun expose","KomSat launch","KomSat Duna release orbit","KomSat Ike release orbit","SciSat1","SciSat2","Exit").
   
 until 0 {
   set action to open_list_dialog("Select action", actions).
@@ -108,5 +117,6 @@ until 0 {
   }
   if actions[action] = "KomSat Duna release orbit" { ejection_orbit(4). }
   if actions[action] = "KomSat Ike release orbit" { ejection_orbit(3). }
+  if actions[action] = "Sun expose" { sun_expose(). }
   if actions[action] = "SciSat1" or actions[action] = "SciSat2" { launch_scisat(actions[action]). }
 }
