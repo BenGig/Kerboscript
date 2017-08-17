@@ -23,6 +23,7 @@ function do_komSat_undock {
   set satRoot to ship:partstagged(komSats[komSat])[0].  // separator
   if not satRoot:istype("PART") {
     print "Satellite already launched.".
+    komSats:remove(komSat).
     wait 5.
     return.
   }
@@ -65,6 +66,10 @@ function do_komSat_undock {
   separator:getmodule("ModuleDecouple"):doaction("decouple", true).
   komSats:remove(komSat).
   wait 30.
+  set dish to ship:partstagged(komSat + "Kom")[0].
+  dish:getmodule("ModuleRTAntenna"):doaction("activate", true).
+  dish:getmodule("ModuleRTAntenna"):setfield("target", komSat).
+
   for panel in ship:partsdubbed("corePanel") {
     panel:getmodule("ModuleDeployableSolarPanel"):doaction("extend solar panel", true).
   }
@@ -79,10 +84,10 @@ function launch_scisat {
   if proc:connection:sendmessage(msg) {
     print "SciSat launch initiated.".
   }
-  wait 30.
-  set dish to ship:partstagged(scisat + "Kom")[0].
-  dish:getmodule("ModuleRTAntenna"):doaction("activate", true).
-  dish:getmodule("ModuleRTAntenna"):setfield("target", scisat).
+//  wait 30.
+//  set dish to ship:partstagged(scisat + "Kom")[0].
+//  dish:getmodule("ModuleRTAntenna"):doaction("activate", true).
+//  dish:getmodule("ModuleRTAntenna"):setfield("target", scisat).
 }
 
 set action to "".
