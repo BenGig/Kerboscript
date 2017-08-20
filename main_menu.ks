@@ -1,7 +1,8 @@
 runoncepath("lib_list_dialog").
+runoncepath("lib_maneuvers").
 
 set main_actions to list("Maneuver","Mission","Fueling","Exit").
-set maneuver_actions to list("Launch","Approach","Dock","Exit").
+set maneuver_actions to list("Launch","Sun orient","Approach","Dock","Exit").
 
 until 0 {
   set action to open_list_dialog("Select action", main_actions).
@@ -23,6 +24,7 @@ until 0 {
       if maneuver_actions[maneuver] = "Launch" {
         runpath("0:/generic_launch", 100000).
       }
+	  if maneuver_actions[maneuver] = "Sun orient" { sun_expose(). }
       if maneuver_actions[maneuver] = "Approach" { runpath("approach.ks"). }
       if maneuver_actions[maneuver] = "Dock" { runpath("dock.ks"). }
     }

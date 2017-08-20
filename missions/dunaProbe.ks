@@ -21,13 +21,14 @@ set vessel(mothershipname+" Probe"):shipname to myname.
 uiWarning("Warning", "Switch vessel NOW").
 wait 10.
 // move away
+sas off.
 ship:partsnamed("liquidEngineMini")[0]:getmodule("ModuleEnginesFX"):doaction("activate engine", true).
 wait 1.
 sas on.
 lock throttle to 0.1.
 wait 3.
 unlock throttle.
-sas off.
+sas on.
 
 print "Waiting for safe distance...".
 wait until mothership:distance > 20.

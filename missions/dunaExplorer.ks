@@ -1,14 +1,14 @@
 runoncepath("lib_list_dialog").
-runoncepath("lib_komsat").
+runoncepath("lib_maneuvers").
 
 //set maneuvers to list("Launch","KomSat release orbit","Sun expose","Exit").
-set komSats TO list("KomSat1","KomSat2","KomSat3","KomSat4","KomSat5","KomSat6","KomSat7","Exit").
+set komSats TO list("DunaKomSat1","DunaKomSat2","DunaKomSat3","DunaKomSat4","IkeKomSat1","IkeKomSat2","IkeKomSat3","Exit").
 
 function gatherParts {
   parameter rootPart.
   parameter satParts.
 
-  if rootPart:name = "commDish" or rootPart:name = "longAntenna" or rootPart:name = "batteryBank" or rootPart:name = "toroidalFuelTank" {
+  if rootPart:name = "commDish" or rootPart:name = "longAntenna" or rootPart:name = "batteryBank" or rootPart:name = "toroidalFuelTank" or rootPart:name = "mediumDishAntenna" or rootPart:name = "solarPanels4" {
     satParts:add(rootPart).
   }
   for item in rootPart:children() {
@@ -28,9 +28,13 @@ function do_komSat_undock {
     return.
   }
   
+  print "Retracting core panels".
   for panel in ship:partsdubbed("corePanel") {
     panel:getmodule("ModuleDeployableSolarPanel"):doaction("retract solar panel", true).
   }
+  wait 10.
+  
+  print "Preparing launch".
   set separator to satRoot.
   gatherParts(satRoot, satParts).
 
@@ -38,6 +42,9 @@ function do_komSat_undock {
     if item:name = "commDish" {
       set dish to item.
     }
+	if item:name = "mediumDishAntenna" {
+	  set miniDish to item.
+	}
     if item:name = "longAntenna" {
       set omni to item.
     }
@@ -59,17 +66,27 @@ function do_komSat_undock {
     wait 5.
     return.
   }
+  print "Ressources ok, activating systems".
+  for item in satParts {
+    if item:name = "solarPanels4" and item:tag <> "delayed" {
+	  item:getmodule("ModuleDeployableSolarPanel"):doaction("extend solar panel", true).
+	}
+  }
   omni:getmodule("ModuleRTAntenna"):doaction("activate", true).
+  miniDish:getmodule("ModuleRTAntenna"):doaction("activate", true).
   dish:getmodule("ModuleRTAntenna"):doaction("activate", true).
   dish:getmodule("ModuleRTAntenna"):setfield("target", "Kerbin").
+  wait 10.
   print "Ready for separation.".
   separator:getmodule("ModuleDecouple"):doaction("decouple", true).
   komSats:remove(komSat).
-  wait 30.
-  set dish to ship:partstagged(komSat + "Kom")[0].
+  wait 5.
+  print "Activating dish " + komSats[komSat] + "Kom".
+  set dish to ship:partstagged(komSats[komSat] + "Kom")[0].
   dish:getmodule("ModuleRTAntenna"):doaction("activate", true).
-  dish:getmodule("ModuleRTAntenna"):setfield("target", komSat).
+  dish:getmodule("ModuleRTAntenna"):setfield("target", SHIPNAME + " Probe").
 
+  wait 60.
   for panel in ship:partsdubbed("corePanel") {
     panel:getmodule("ModuleDeployableSolarPanel"):doaction("extend solar panel", true).
   }
@@ -79,28 +96,27 @@ function launch_scisat {
   parameter scisat.
   
   clearscreen.
+  print "Retracting core panels".
+  for panel in ship:partsdubbed("corePanel") {
+    panel:getmodule("ModuleDeployableSolarPanel"):doaction("retract solar panel", true).
+  }
+  wait 10.
   set proc to processor(scisat + "CPU").
   set msg to scisat.
   if proc:connection:sendmessage(msg) {
     print "SciSat launch initiated.".
   }
-//  wait 30.
-//  set dish to ship:partstagged(scisat + "Kom")[0].
-//  dish:getmodule("ModuleRTAntenna"):doaction("activate", true).
-//  dish:getmodule("ModuleRTAntenna"):setfield("target", scisat).
-}
-
-function sun_expose {
-  clearscreen.
-  sas off.
-  set ship:control:roll to 0.01.
-  wait until (ship:facing:roll > 85 and ship:facing:roll < 95) or (ship:facing:roll > 265 and ship:facing:roll < 275).
-  set ship:control:roll to 0.
-  sas on.
+  wait 30.
+  set dish to ship:partstagged(scisat + "Kom")[0].
+  dish:getmodule("ModuleRTAntenna"):doaction("activate", true).
+  dish:getmodule("ModuleRTAntenna"):setfield("target", scisat).
+  for panel in ship:partsdubbed("corePanel") {
+    panel:getmodule("ModuleDeployableSolarPanel"):doaction("extend solar panel", true).
+  }
 }
 
 set action to "".
-set actions TO list("Sun expose","KomSat launch","KomSat Duna release orbit","KomSat Ike release orbit","SciSat1","SciSat2","Exit").
+set actions TO list("KomSat launch","KomSat Duna release orbit","KomSat Ike release orbit","SciSat1","SciSat2","Exit").
   
 until 0 {
   set action to open_list_dialog("Select action", actions).
@@ -115,8 +131,7 @@ until 0 {
       do_komSat_undock(komSat).
 	  }
   }
-  if actions[action] = "KomSat Duna release orbit" { ejection_orbit(4). }
-  if actions[action] = "KomSat Ike release orbit" { ejection_orbit(3). }
-  if actions[action] = "Sun expose" { sun_expose(). }
+  if actions[action] = "KomSat Duna release orbit" { ejection_orbit(4). terminal:input:getchar(). }
+  if actions[action] = "KomSat Ike release orbit" { ejection_orbit(3). terminal:input:getchar(). }
   if actions[action] = "SciSat1" or actions[action] = "SciSat2" { launch_scisat(actions[action]). }
 }
