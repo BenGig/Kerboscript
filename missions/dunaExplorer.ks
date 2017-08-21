@@ -19,6 +19,8 @@ function gatherParts {
 function do_komSat_undock {
   parameter komSat.
   clearscreen.
+  print "Launch sequence for " + komSats[komSat] + " initiated.".
+  
   set satParts to list().
   set satRoot to ship:partstagged(komSats[komSat])[0].  // separator
   if not satRoot:istype("PART") {
@@ -67,29 +69,38 @@ function do_komSat_undock {
     return.
   }
   print "Ressources ok, activating systems".
-  for item in satParts {
-    if item:name = "solarPanels4" and item:tag <> "delayed" {
-	  item:getmodule("ModuleDeployableSolarPanel"):doaction("extend solar panel", true).
-	}
-  }
+//  for item in satParts {
+//    if item:name = "solarPanels4" and item:tag <> "delayed" {
+//	  item:getmodule("ModuleDeployableSolarPanel"):doaction("extend solar panel", true).
+//	}
+//  }
   omni:getmodule("ModuleRTAntenna"):doaction("activate", true).
   miniDish:getmodule("ModuleRTAntenna"):doaction("activate", true).
   dish:getmodule("ModuleRTAntenna"):doaction("activate", true).
   dish:getmodule("ModuleRTAntenna"):setfield("target", "Kerbin").
   wait 10.
   print "Ready for separation.".
-  separator:getmodule("ModuleDecouple"):doaction("decouple", true).
-  komSats:remove(komSat).
-  wait 5.
-  print "Activating dish " + komSats[komSat] + "Kom".
-  set dish to ship:partstagged(komSats[komSat] + "Kom")[0].
-  dish:getmodule("ModuleRTAntenna"):doaction("activate", true).
-  dish:getmodule("ModuleRTAntenna"):setfield("target", SHIPNAME + " Probe").
-
+//  separator:getmodule("ModuleDecouple"):doaction("decouple", true).
+  
+  print "Sending message to " + komSats[komSat] + "CPU".
+  set proc to processor(komSats[komSat] + "CPU").
+  set msg to komSats[komSat].
+  print "Message: " + komSats[komSat].
+  if proc:connection:sendmessage(msg) {
+    print "Launch initiated.".
+  }
+  
   wait 60.
+  
   for panel in ship:partsdubbed("corePanel") {
     panel:getmodule("ModuleDeployableSolarPanel"):doaction("extend solar panel", true).
   }
+  print "Activating mothership dish " + komSats[komSat] + "Kom".
+  set dish to ship:partstagged(komSats[komSat] + "Kom")[0].
+  dish:getmodule("ModuleRTAntenna"):doaction("activate", true).
+  dish:getmodule("ModuleRTAntenna"):setfield("target", komSats[komSat]).
+
+  komSats:remove(komSat).
 }
 
 function launch_scisat {

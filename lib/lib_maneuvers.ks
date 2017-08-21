@@ -48,6 +48,7 @@ function ejection_orbit {
 
 // Turn ship in direction of sun
 function sun_expose {
+  print "Setting target to Sun".
   set target to sun.
   return.
   

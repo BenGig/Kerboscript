@@ -1,4 +1,5 @@
 runoncepath("lib_maneuvers.ks").
+runoncepath("lib_ui.ks").
 
 clearscreen.
 print "Waiting for launch message...".
@@ -20,11 +21,12 @@ set vessel(mothershipname+" Probe"):shipname to myname.
 uiWarning("Warning", "Switch vessel NOW").
 
 // move away
+wait 10.
 sas on.
 ship:partsnamed("microEngine")[0]:getmodule("ModuleEnginesFX"):doaction("activate engine", true).
 
 print "Waiting for safe distance...".
-wait until mothership:distance > 20.
+wait until mothership:distance > 7.
 
 panels on.
 set omni to ship:partsnamed("longAntenna")[0].
@@ -32,5 +34,6 @@ omni:getmodule("ModuleRTAntenna"):doaction("activate", true).
 set dish to ship:partsnamed("mediumDishAntenna")[0].
 dish:getmodule("ModuleRTAntenna"):doaction("activate", true).
 dish:getmodule("ModuleRTAntenna"):setfield("target", mothershipname).
+sun_expose().
 
 uiWarning("Warning", "Switch vessel NOW").
