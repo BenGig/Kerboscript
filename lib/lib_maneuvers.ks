@@ -48,8 +48,13 @@ function ejection_orbit {
 
 // Turn ship in direction of sun
 function sun_expose {
+  sas on.
   print "Setting target to Sun".
   set target to sun.
+  wait 1.
+  until ship:facing:vector:normalized * target:direction:vector:normalized < -0.9999 {
+    set sasmode to "antitarget".
+  }
   return.
   
   clearscreen.

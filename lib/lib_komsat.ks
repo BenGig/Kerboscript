@@ -1,23 +1,5 @@
-// Interplanetary maneuvers
-
-function mnv_hko {
-  clearscreen.
-  print "Preparing transfer to high Kerbin orbit".
-
-  sas off.
-
-  lock steering to prograde.
-  wait until vdot(facing:forevector, prograde:forevector) >= 0.995.
-  
-  until ship:apoapsis > 7500000 {
-    lock throttle to 1.
-  }
-  lock throttle to 0.
-  unlock throttle.
-  unlock steering.
-}
-
 // Put mothership in orbit suited for spaced out satellite launch
+// Calculate node, because cooked steering is broken with RemoteTech on long distances
 function ejection_orbit {
   parameter number_of_sats.
   
@@ -27,14 +9,27 @@ function ejection_orbit {
   set ej_orb_period to ship:orbit:period / number_of_sats * (number_of_sats -1) / 2.
   
   clearscreen.
-  print "Half orbit time: " + ej_orb_period.
-  set hours to (ej_orb_period - mod(ej_orb_period, 3600))/3600.
+  print "Orbit in seconds: " + ship:orbit:period.
+  set hours to floor(ej_orb_period / 3600).
   set minutes_rest to ej_orb_period - hours*3600.
-  set minutes to (minutes_rest - mod(ej_orb_period-hours*3600, 60))/60.
-  set seconds to ej_orb_period - hours*3600 - minutes*60.
+  set minutes to floor(minutes_rest / 60).
+  set seconds to round(ej_orb_period - hours*3600 - minutes*60).
   print "Calculated half orbit time: " + hours + " h " + minutes + " m " + seconds + " s".
-  terminal:input:getchar().
+  // terminal:input:getchar().
   
+  set mynode to node(time:seconds + 180, 0, 0, -1).
+  add mynode.
+  
+  print "Calculating node".
+  until (mynode:orbit:period < ej_orb_period*2) {
+    set mynode:prograde to mynode:prograde - 0.1.
+  }
+  print "Fine tuning...".
+  until (mynode:orbit:period < ej_orb_period*2) {
+    set mynode:prograde to mynode:prograde - 0.01.
+  }
+  
+  print "Maneuver node set".
 //  lock throttle to tset.
   
 //  until 0 {
@@ -49,4 +44,22 @@ function ejection_orbit {
 //  }  
 
   unlock steering.
+}
+
+// Turn ship in direction of sun
+function sun_expose {
+  clearscreen.
+  set the_sun to SUN.
+  set sun_position to sun:position.
+  
+  print "Sun:  " + sun_position.
+  print "Ship: " + ship:facing.
+  
+  
+  return.
+  sas off.
+  set ship:control:roll to 0.01.
+  wait until (ship:facing:roll > 85 and ship:facing:roll < 95) or (ship:facing:roll > 265 and ship:facing:roll < 275).
+  set ship:control:roll to 0.
+  sas on.
 }
