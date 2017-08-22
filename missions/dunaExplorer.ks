@@ -30,12 +30,6 @@ function do_komSat_undock {
     return.
   }
   
-  print "Retracting core panels".
-  for panel in ship:partsdubbed("corePanel") {
-    panel:getmodule("ModuleDeployableSolarPanel"):doaction("retract solar panel", true).
-  }
-  wait 10.
-  
   print "Preparing launch".
   set separator to satRoot.
   gatherParts(satRoot, satParts).
@@ -58,7 +52,7 @@ function do_komSat_undock {
     }
   }  
 
-  if battery:resources[0]:amount < 0.9 * battery:resources[0]:capacity {
+  if battery:resources[0]:amount < 0.5 * battery:resources[0]:capacity {
     print "Battery not charged, aborting".
     wait 5.
     return.
@@ -69,6 +63,13 @@ function do_komSat_undock {
     return.
   }
   print "Ressources ok, activating systems".
+
+  print "Retracting core panels".
+  for panel in ship:partsdubbed("corePanel") {
+    panel:getmodule("ModuleDeployableSolarPanel"):doaction("retract solar panel", true).
+  }
+  wait 10.
+  
 //  for item in satParts {
 //    if item:name = "solarPanels4" and item:tag <> "delayed" {
 //	  item:getmodule("ModuleDeployableSolarPanel"):doaction("extend solar panel", true).
