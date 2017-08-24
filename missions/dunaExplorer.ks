@@ -118,7 +118,7 @@ function launch_scisat {
   if proc:connection:sendmessage(msg) {
     print "SciSat launch initiated.".
   }
-  wait 30.
+  wait 40.
   set dish to ship:partstagged(scisat + "Kom")[0].
   dish:getmodule("ModuleRTAntenna"):doaction("activate", true).
   dish:getmodule("ModuleRTAntenna"):setfield("target", scisat).

@@ -33,7 +33,7 @@ if shipname:startswith("Duna Explorer") {
   sas on.
 
   print "Waiting for safe distance...".
-  wait until mothership:distance > 8.
+  wait until mothership:distance > 10.
 
   panels on.
   set omni to ship:partsnamed("longAntenna")[0].
